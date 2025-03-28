@@ -18,22 +18,15 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Fix file permissions
-        run: chmod -R 777 .git/
+      - name: Fix Git Config Permissions
+        run: sudo chmod 777 .git/config
 
-      - name: Set Git Configurations
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@example.com"
-
-      - name: Disable CI
-        run: echo "CI=false" >> $GITHUB_ENV
-
-      - name: Change Ownership of .git Directory
-        run: sudo chown -R $USER:$USER .git/
+      - name: Change Ownership of Git Config
+        run: sudo chown -R $(whoami) .git/
 
       - uses: actions/checkout@v4
         with:
+          persist-credentials: false  # <== Fix för .extraheader-felet
           submodules: true
           lfs: false
 
@@ -55,9 +48,9 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_WATER_029F55103 }}
           action: "upload"
-          app_location: "/" # App source code path
-          api_location: "" # API source code path - optional
-          output_location: "build" # Built app content directory - optional
+          app_location: "/" 
+          api_location: ""  
+          output_location: "build"
           github_id_token: ${{ steps.idtoken.outputs.result }}
 
   close_pull_request_job:
